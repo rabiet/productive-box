@@ -15,7 +15,7 @@ interface IRepo {
   owner: string;
 }
 
-(async() => {
+(async () => {
   /**
    * First, get user id
    */
@@ -40,15 +40,15 @@ interface IRepo {
    * Third, get commit time and parse into commit-time/hour diagram
    */
   const committedTimeResponseMap = await Promise.all(
-    repos.map(({name, owner}) => githubQuery(createCommittedDateQuery(id, name, owner)))
+    repos.map(({ name, owner }) => githubQuery(createCommittedDateQuery(id, name, owner)))
   ).catch(error => console.error(`Unable to get the commit info\n${error}`));
 
   if (!committedTimeResponseMap) return;
 
   let morning = 0; // 6 - 12
   let daytime = 0; // 12 - 18
-  let evening = 0; // 18 - 24
-  let night = 0; // 0 - 6
+  let evening = 0; // 18 - 22
+  let night = 0; // 22 - 6
 
   committedTimeResponseMap.forEach(committedTimeResponse => {
     committedTimeResponse?.data?.repository?.defaultBranchRef?.target?.history?.edges.forEach(edge => {
@@ -61,8 +61,8 @@ interface IRepo {
        */
       if (hour >= 6 && hour < 12) morning++;
       if (hour >= 12 && hour < 18) daytime++;
-      if (hour >= 18 && hour < 24) evening++;
-      if (hour >= 0 && hour < 6) night++;
+      if (hour >= 18 && hour < 22) evening++;
+      if ((hour >= 22) || (hour >= 0 && hour < 6)) night++;
     });
   });
 
